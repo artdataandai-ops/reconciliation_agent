@@ -88,9 +88,16 @@ async def lifespan(app):
 
 
 app = FastAPI(title="Reconciliation Exception Agent — POC", version="1.0", lifespan=lifespan)
+
+# CORS — the React frontend is deployed on a different origin (Cloudflare Pages), so the
+# browser needs our Access-Control-Allow-Origin header. CORS_ALLOWED_ORIGINS is a
+# comma-separated env var (set in backend/.env); the localhost dev hosts are always allowed.
+_DEFAULT_FRONTEND = "https://reconciliation-agent-arttechgroup.pages.dev"
+_extra_origins = [o.strip() for o in os.getenv("CORS_ALLOWED_ORIGINS", _DEFAULT_FRONTEND).split(",") if o.strip()]
+CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] + _extra_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=CORS_ORIGINS,
     allow_methods=["*"], allow_headers=["*"],
 )
 

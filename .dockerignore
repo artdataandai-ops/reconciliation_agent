@@ -1,0 +1,35 @@
+# Keep the build context small — the image only needs backend/ + gen_unrecon_day.py
+# (both COPYed explicitly in backend/Dockerfile).
+
+# Python caches / envs
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets are injected at runtime via env_file, never baked into the image.
+.env
+backend/.env
+
+# Volume-mounted at runtime; no need in the image.
+data/
+logs/
+
+# Frontend (deployed separately on Cloudflare Pages).
+frontend/
+
+# Reference material / not source.
+archive/
+samples/
+docs/
+
+# VCS / editors / OS cruft
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
