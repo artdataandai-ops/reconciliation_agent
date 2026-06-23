@@ -21,14 +21,16 @@ const catTotals = (cls) => {
 function Sidebar({ view, onNavigate }) {
   return (
     <aside className="sidebar">
-      <div className="brand"><span className="dot">R</span> ReconAgent</div>
+      <div className="brand"><span className="dot">R</span>
+        <div className="brand-text"><div className="brand-name">Recon Agent</div><div className="brand-desc">Reconciliation Agent</div></div>
+      </div>
       <nav className="nav">{NAV.map(([ic, l, key]) => (
         <a key={l} className={key && view === key ? 'active' : ''}
            onClick={key ? () => onNavigate(key) : undefined}>
           <span className="ico">{ic}</span>{l}
         </a>
       ))}</nav>
-      <div className="side-foot">Reconciliation Exception Agent</div>
+      <div className="side-foot">Art Technology and Software</div>
     </aside>
   )
 }
@@ -59,7 +61,7 @@ function Waterfall({ totals, residual, visible }) {
     { k: 'Timing', v: totals.timing, c: '#6b7280', from: REVEAL.timing },
     { k: 'FX rate-timing', v: totals.fx, c: '#9ca3af', from: REVEAL.fx },
     { k: 'Rounding', v: Math.abs(totals.rounding), c: '#cbd5e1', from: REVEAL.rounding },
-    { k: 'True break → analyst', v: residual, c: '#f6c344', res: true, from: REVEAL.residual },
+    { k: 'True break → analyst', v: residual, c: '#FEC422', res: true, from: REVEAL.residual },
   ]
   const total = all.reduce((s, x) => s + Math.abs(x.v), 0) || 1
   const shown = all.filter((s) => visible >= s.from)
@@ -240,13 +242,11 @@ export default function App() {
       <main className="main">
         <div className="topbar">
           <div>
-            <h1>Reconciliation — Unreconciled Day</h1>
+            <h1>Daily Settlement Reconciliation</h1>
             <div className="sub">{meta ? <>Settlement day <b>{fmtDay(meta.reconciled_day)}</b> · SRE {meta.sre} · catch-up file {fmtDay(meta.catch_up_day)}</> : 'Loading…'}</div>
           </div>
           <div className="right">
-            <span className={`badge ${running || (result && !hasAgent) || routed ? 'warn' : ''}`}>
-              {running && <span className="spin-d" style={{ marginRight: 8, verticalAlign: -1 }} />}{badge}
-            </span>
+            {!running && <span className={`badge ${(result && !hasAgent) || routed ? 'warn' : ''}`}>{badge}</span>}
             <button className="btn primary" onClick={handleRun} disabled={running}>
               {running ? <><span className="spin" />Running…</> : 'Run reconciliation'}
             </button>
