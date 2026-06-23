@@ -7,8 +7,7 @@ const fmtDay = (d) => (d ? `${d.slice(6, 8)} ${['Jan','Feb','Mar','Apr','May','J
 
 const REVEAL = { raw: 1, timing: 3, fx: 4, rounding: 4, explained: 4, isa: 5, residual: 5 }
 const NAV = [
-  ['▦', 'Dashboard', true], ['⇄', 'Reconciliation', false],
-  ['🗎', 'Files', false], ['!', 'Exceptions', false], ['⚙', 'Settings', false],
+  ['▦', 'Dashboard', 'dashboard'], ['⇄', 'Reconciliation', 'reconciliation'],
 ]
 
 const catTotals = (cls) => {
@@ -17,11 +16,16 @@ const catTotals = (cls) => {
   return t
 }
 
-function Sidebar() {
+function Sidebar({ view, onNavigate }) {
   return (
     <aside className="sidebar">
       <div className="brand"><span className="dot">R</span> ReconAgent</div>
-      <nav className="nav">{NAV.map(([ic, l, a]) => <a key={l} className={a ? 'active' : ''}><span className="ico">{ic}</span>{l}</a>)}</nav>
+      <nav className="nav">{NAV.map(([ic, l, key]) => (
+        <a key={l} className={key && view === key ? 'active' : ''}
+           onClick={key ? () => onNavigate(key) : undefined}>
+          <span className="ico">{ic}</span>{l}
+        </a>
+      ))}</nav>
       <div className="side-foot">Reconciliation Exception Agent</div>
     </aside>
   )
@@ -95,6 +99,62 @@ function Exceptions({ rows, visible }) {
   )
 }
 
+const TXN_STATUS = {
+  matched:       { label: 'Reconciled',             bucket: 'reconciled' },
+  fx:            { label: 'Reconciled · fx',         bucket: 'reconciled' },
+  timing:        { label: 'Reconciled · timing',     bucket: 'reconciled' },
+  residual:      { label: 'Unreconciled',            bucket: 'break' },
+  platform_only: { label: 'Unreconciled · platform', bucket: 'break' },
+}
+const svc = (region) => (region === 'INTL' ? 'International' : region === 'DOM' ? 'National' : '—')
+
+function ReconciliationView({ result }) {
+  const [filter, setFilter] = useState('all')
+  const txns = result?.findings?.transactions
+  if (!txns) return (
+    <section className="card panel"><h2>Transactions</h2>
+      <div className="empty">Click <b>Run reconciliation</b> to list every transaction as reconciled or unreconciled.</div>
+    </section>
+  )
+  const sum = result.findings.transaction_summary || {}
+  const rows = txns.filter((t) => filter === 'all' || TXN_STATUS[t.status]?.bucket === filter)
+  return (
+    <section className="card panel">
+      <h2>Transactions <span className="muted">{sum.total} txns · {sum.reconciled} reconciled · {sum.break} unreconciled</span></h2>
+      <div className="txn-filter">
+        {[['all', 'All'], ['reconciled', 'Reconciled'], ['break', 'Unreconciled']].map(([f, lbl]) => (
+          <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{lbl}</button>
+        ))}
+      </div>
+      <table className="x">
+        <thead><tr>
+          <th>Status</th><th>Merchant</th>
+          <th style={{ textAlign: 'right' }}>Net Settlement</th>
+          <th style={{ textAlign: 'right' }}>Gap</th>
+          <th style={{ textAlign: 'right' }}>Net Processed</th>
+          <th>Ccy</th><th>Service</th>
+        </tr></thead>
+        <tbody>
+          {rows.map((t, i) => {
+            const s = TXN_STATUS[t.status] || { label: t.status, bucket: '' }
+            return (
+              <tr key={i} className={s.bucket === 'break' ? 'res' : ''}>
+                <td><span className={`pill ${t.status}`}>{s.label}</span></td>
+                <td><b>{t.merchant}</b>{t.arn && <div className="mono">{t.arn}</div>}</td>
+                <td className="amt">{gbp(t.visa_amount)}</td>
+                <td className="amt">{gbp(t.gap)}</td>
+                <td className="amt">{t.thredd_amount == null ? '—' : gbp(t.thredd_amount)}</td>
+                <td>{t.source_ccy || '—'}</td>
+                <td>{svc(t.region)}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </section>
+  )
+}
+
 function PreviewModal({ name, data, onClose }) {
   return (
     <div className="modal-bg" onClick={onClose}>
@@ -123,6 +183,7 @@ export default function App() {
   const [visible, setVisible] = useState(0)
   const [doing, setDoing] = useState(-1)
   const [preview, setPreview] = useState(null)
+  const [view, setView] = useState('dashboard')
 
   useEffect(() => { getFiles().then(setMeta).catch((e) => console.error(e)) }, [])
 
@@ -173,7 +234,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar />
+      <Sidebar view={view} onNavigate={setView} />
       <main className="main">
         <div className="topbar">
           <div>
@@ -190,6 +251,7 @@ export default function App() {
           </div>
         </div>
 
+        {view === 'dashboard' && (<>
         <div className="grid-kpi">
           <Kpi lbl="Raw difference" val={showRaw ? gbp(t.raw_difference) : '—'}
                hint={showRaw ? `Visa net ${gbp(t.visa_net_settlement)} vs Thredd ${gbp(t.thredd_day1_sum)}` : 'Run to compute'} />
@@ -293,6 +355,9 @@ export default function App() {
             )}
           </section>
         </div>
+        </>)}
+
+        {view === 'reconciliation' && <ReconciliationView result={result} />}
       </main>
 
       {preview && <PreviewModal name={preview.name} data={preview.data} onClose={() => setPreview(null)} />}

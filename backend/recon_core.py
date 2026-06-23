@@ -90,7 +90,7 @@ def reconcile(visa_recs, thredd_d1, thredd_d2, visa_net: Decimal) -> dict:
     d1 = {r["arn"]: r for r in thredd_d1}
     d2 = {r["arn"]: r for r in thredd_d2}
 
-    timing, fx, residual = [], [], []
+    timing, fx, residual, transactions = [], [], [], []
     timing_total = fx_total = residual_total = Decimal("0")
 
     for v in visa_recs:
@@ -98,20 +98,38 @@ def reconcile(visa_recs, thredd_d1, thredd_d2, visa_net: Decimal) -> dict:
         if arn in d1:                                  # matched on the reconciled day
             delta = v["settle_gbp"] - d1[arn]["settlement_amt"]
             fx_total += delta
-            if abs(delta) >= FX_LABEL_THRESHOLD:
+            status = "fx" if abs(delta) >= FX_LABEL_THRESHOLD else "matched"
+            if status == "fx":
                 fx.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
                            "visa_amount": _f(v["settle_gbp"]), "thredd_amount": _f(d1[arn]["settlement_amt"]),
                            "delta": _f(delta), "visa_rate": float(v["conv_rate"]) if v["conv_rate"] else None,
                            "thredd_rate": float(d1[arn]["rate"]) if d1[arn]["rate"] else None})
+            transactions.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
+                                 "region": v["region"], "visa_amount": _f(v["settle_gbp"]),
+                                 "thredd_amount": _f(d1[arn]["settlement_amt"]), "gap": _f(delta), "status": status})
         elif arn in d2:                                # late — found in the next day's file
             timing_total += v["settle_gbp"]
             timing.append({"arn": arn, "merchant": v["merchant"], "amount": _f(v["settle_gbp"]),
                            "scheme_settle_date": d2[arn]["scheme_settle_date"],
                            "thredd_settle_date": d2[arn]["settle_date"]})
+            transactions.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
+                                 "region": v["region"], "visa_amount": _f(v["settle_gbp"]),
+                                 "thredd_amount": None, "gap": _f(v["settle_gbp"]), "status": "timing"})
         else:                                          # nowhere in Thredd — genuine break
             residual_total += v["settle_gbp"]
             residual.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
                              "amount": _f(v["settle_gbp"])})
+            transactions.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
+                                 "region": v["region"], "visa_amount": _f(v["settle_gbp"]),
+                                 "thredd_amount": None, "gap": _f(v["settle_gbp"]), "status": "residual"})
+
+    visa_arns = {v["arn"] for v in visa_recs}
+    for _arn, _r in d1.items():                        # platform-only: in Thredd D1 but not in Visa
+        if _arn not in visa_arns:
+            transactions.append({"arn": _arn, "merchant": _r.get("merchant", ""),
+                                 "source_ccy": None, "region": _r.get("region"),
+                                 "visa_amount": None, "thredd_amount": _f(_r["settlement_amt"]),
+                                 "gap": _f(-_r["settlement_amt"]), "status": "platform_only"})
 
     thredd_d1_sum = sum((r["settlement_amt"] for r in thredd_d1), Decimal("0"))
     raw_diff = visa_net - thredd_d1_sum
@@ -121,8 +139,14 @@ def reconcile(visa_recs, thredd_d1, thredd_d2, visa_net: Decimal) -> dict:
     visa_isa = sum((v["isa"] for v in visa_recs if v["arn"] in d1), Decimal("0"))
     thredd_isa = sum((r["isa"] for r in thredd_d1), Decimal("0"))
 
+    _reconciled = sum(1 for t in transactions if t["status"] in ("matched", "fx", "timing"))
+    txn_summary = {"total": len(transactions), "reconciled": _reconciled,
+                   "break": len(transactions) - _reconciled}
+
     return {
         "currency": "GBP",
+        "transactions": transactions,
+        "transaction_summary": txn_summary,
         "totals": {
             "visa_net_settlement": _f(visa_net),
             "thredd_day1_sum": _f(thredd_d1_sum),

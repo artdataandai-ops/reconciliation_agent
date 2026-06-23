@@ -149,7 +149,10 @@ def reconcile():
     agent, agent_error = None, None
     if lyzr_client.is_configured():
         try:
-            agent = lyzr_client.explain(findings)   # the brain: classify / narrate / route
+            # The transactions list is for the UI only — strip it so the agent's input (and thus its
+            # classification/routing/escalation) stays byte-identical to before this feature.
+            agent_input = {k: v for k, v in findings.items() if k not in ("transactions", "transaction_summary")}
+            agent = lyzr_client.explain(agent_input)   # the brain: classify / narrate / route
         except Exception as e:
             agent_error = f"Lyzr call failed: {e}"
     return {"findings": findings, "agent": agent,
