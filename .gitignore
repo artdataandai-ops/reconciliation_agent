@@ -1,0 +1,111 @@
+# ─────────────────────────────────────────────────────────────
+# Secrets / environment
+# ─────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+backend/.env
+# Keep the template tracked:
+!.env.example
+!backend/.env.example
+
+# ─────────────────────────────────────────────────────────────
+# Python (backend)
+# ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+wheels/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Test / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+
+# ─────────────────────────────────────────────────────────────
+# Node / frontend (React + Vite)
+# ─────────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist-ssr/
+.vite/
+*.local
+
+# Package manager logs / debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ─────────────────────────────────────────────────────────────
+# Generated data (output of gen_unrecon_day.py; AUTO_REGEN recreates it)
+# ─────────────────────────────────────────────────────────────
+data/
+
+# ─────────────────────────────────────────────────────────────
+# Archive (reference docs / binaries — not source)
+# ─────────────────────────────────────────────────────────────
+archive/
+
+# ─────────────────────────────────────────────────────────────
+# Logs
+# ─────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ─────────────────────────────────────────────────────────────
+# OS cruft
+# ─────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ─────────────────────────────────────────────────────────────
+# Editors / IDEs
+# ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# ─────────────────────────────────────────────────────────────
+# Misc
+# ─────────────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.pid

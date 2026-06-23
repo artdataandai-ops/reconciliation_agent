@@ -1,0 +1,80 @@
+{
+  "currency": "GBP",
+  "totals": {
+    "visa_net_settlement": 1398.49,
+    "thredd_day1_sum": 1110.61,
+    "raw_difference": 287.88,
+    "visa_record_count": 13,
+    "thredd_day1_count": 11,
+    "thredd_day2_count": 2
+  },
+  "facts": {
+    "timing": {
+      "total": 280.6,
+      "items": [
+        {
+          "arn": "74220505101000000000400",
+          "merchant": "JOHN LEWIS 0031",
+          "amount": 230.0,
+          "scheme_settle_date": "20260617",
+          "thredd_settle_date": "20260618"
+        },
+        {
+          "arn": "74220505101000000001200",
+          "merchant": "H&M BERLIN",
+          "amount": 50.6,
+          "scheme_settle_date": "20260617",
+          "thredd_settle_date": "20260618"
+        }
+      ]
+    },
+    "fx_rate_timing": {
+      "total": 7.29,
+      "items": [
+        {
+          "arn": "74220505101000000000900",
+          "merchant": "FNAC PARIS",
+          "source_ccy": "EUR",
+          "visa_amount": 68.56,
+          "thredd_amount": 67.46,
+          "delta": 1.1,
+          "visa_rate": 0.857,
+          "thredd_rate": 0.843271
+        },
+        {
+          "arn": "74220505101000000001000",
+          "merchant": "APPLE STORE SF",
+          "source_ccy": "USD",
+          "visa_amount": 402.5,
+          "thredd_amount": 396.31,
+          "delta": 6.19,
+          "visa_rate": 0.805,
+          "thredd_rate": 0.792618
+        }
+      ]
+    },
+    "rounding": {
+      "total": -0.01,
+      "pct_of_net": 0.0007,
+      "tolerance_pct": 0.01
+    },
+    "isa": {
+      "visa_total": 4.26,
+      "thredd_total": 4.26,
+      "equal": true
+    },
+    "residual": {
+      "total": 0.0,
+      "items": []
+    }
+  },
+  "check": {
+    "components_sum": 287.88,
+    "matches_raw": true
+  },
+  "dates": {
+    "reconciled_day": "20260617",
+    "catch_up_day": "20260618",
+    "sre": "711520"
+  }
+}
