@@ -4,6 +4,8 @@ import { getFiles, getPreview, runReconcile } from './api.js'
 const gbp = (n) =>
   n == null ? '—' : '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const fmtDay = (d) => (d ? `${d.slice(6, 8)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+d.slice(4, 6) - 1]} ${d.slice(0, 4)}` : '')
+// display-only: never show the processor's brand in file names (real name is still used for fetch)
+const maskName = (n) => (n ? n.replace('THREDD_TXN_REPORT', 'PROCESSOR_TXN_REPORT') : n)
 
 const REVEAL = { raw: 1, timing: 3, fx: 4, rounding: 4, explained: 4, isa: 5, residual: 5 }
 const NAV = [
@@ -38,11 +40,11 @@ const Kpi = ({ lbl, val, hint, accent }) => (
 )
 
 function FileCard({ f, onPreview, reconciledDay, catchUpDay }) {
-  const side = f.side === 'Visa' ? 'visa' : 'thredd'
+  const side = f.side === 'Visa' ? 'visa' : 'processor'
   const role = f.day === reconciledDay ? 'settlement day' : f.day === catchUpDay ? 'catch-up' : null
   return (
     <div className="file">
-      <div className="row1"><span className="nm">{f.name}</span><span className={`tag ${side}`}>{f.side}</span></div>
+      <div className="row1"><span className="nm">{maskName(f.name)}</span><span className={`tag ${side}`}>{f.side}</span></div>
       <div className="meta">{f.kind} · {fmtDay(f.day)}{role ? ` (${role})` : ''}</div>
       <div className="row1" style={{ marginTop: 10 }}>
         <span className="rcv">✓ received · {f.records} records</span>
@@ -159,7 +161,7 @@ function PreviewModal({ name, data, onClose }) {
   return (
     <div className="modal-bg" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="hd"><b>{name}</b><button className="x" onClick={onClose}>×</button></div>
+        <div className="hd"><b>{maskName(name)}</b><button className="x" onClick={onClose}>×</button></div>
         <div className="bd">
           {!data && <div className="empty">Loading…</div>}
           {data?.type === 'json' && <pre className="raw">{JSON.stringify(data.data, null, 2)}</pre>}
@@ -254,7 +256,7 @@ export default function App() {
         {view === 'dashboard' && (<>
         <div className="grid-kpi">
           <Kpi lbl="Raw difference" val={showRaw ? gbp(t.raw_difference) : '—'}
-               hint={showRaw ? `Visa net ${gbp(t.visa_net_settlement)} vs Thredd ${gbp(t.thredd_day1_sum)}` : 'Run to compute'} />
+               hint={showRaw ? `Visa net ${gbp(t.visa_net_settlement)} vs Processor ${gbp(t.thredd_day1_sum)}` : 'Run to compute'} />
           <Kpi lbl="Explained" val={hasAgent && v >= REVEAL.explained ? gbp(explained) : '—'}
                hint={result && !hasAgent ? 'needs agent' : (hasAgent && v >= REVEAL.explained ? 'timing + FX + rounding' : '—')} />
           <Kpi lbl="ISA confirmed" val={hasAgent && v >= REVEAL.isa ? (isaItem?.status === 'confirmed' ? '✓ equal' : 'review') : '—'}
@@ -266,7 +268,7 @@ export default function App() {
         <div className="cols">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <section className="card panel">
-              <h2>Files received <span className="muted">2 from Visa · 2 from Thredd</span></h2>
+              <h2>Files received <span className="muted">2 from Visa · 2 from Processor</span></h2>
               {meta ? <div className="files">{meta.files.map((file) => <FileCard key={file.name} f={file} onPreview={openPreview} reconciledDay={meta.reconciled_day} catchUpDay={meta.catch_up_day} />)}</div> : <div className="empty">Loading files…</div>}
               <div className="note">In production these arrive automatically on sFTP and the agent triggers when all are present. Here: pre-loaded, run on demand.</div>
             </section>

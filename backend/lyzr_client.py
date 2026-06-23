@@ -42,7 +42,7 @@ def _call_lyzr(findings: dict) -> dict:
     msg = ("Reconcile this Unreconciled Day. Findings JSON follows. Classify every difference, "
            "produce the 5-step explanation, and decide routing. Respond with ONLY the JSON contract. "
            "In timing explanations use each item's actual scheme_settle_date (Visa) and thredd_settle_date "
-           "(Thredd) formatted 'DD Mon YYYY' (e.g. '18 Jun 2026') — never 'Day 1'/'Day 2' or 'the next day'.\n\n"
+           "(processor) formatted 'DD Mon YYYY' (e.g. '18 Jun 2026') — never 'Day 1'/'Day 2' or 'the next day'.\n\n"
            + json.dumps(findings))
     r = requests.post(
         LYZR_API_URL,

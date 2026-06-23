@@ -93,8 +93,8 @@ def _meta():
     return fp, [
         info(fp["visa_dom"],  "Visa",   "Domestic clearing (BASE II)",      fp["d1"]),
         info(fp["visa_intl"], "Visa",   "International clearing (BASE II)",  fp["d1"]),
-        info(fp["thredd_d1"], "Thredd", "Transaction XML report",   fp["d1"]),
-        info(fp["thredd_d2"], "Thredd", "Transaction XML report",   fp["d2"]),
+        info(fp["thredd_d1"], "Processor", "Transaction XML report",   fp["d1"]),
+        info(fp["thredd_d2"], "Processor", "Transaction XML report",   fp["d2"]),
     ]
 
 @app.get("/")
