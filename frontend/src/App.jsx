@@ -18,7 +18,7 @@ const catTotals = (cls) => {
   return t
 }
 
-function Sidebar({ view, onNavigate }) {
+function Sidebar({ view, onNavigate, theme, onToggleTheme }) {
   return (
     <aside className="sidebar">
       <div className="brand"><span className="dot">R</span>
@@ -30,6 +30,11 @@ function Sidebar({ view, onNavigate }) {
           <span className="ico">{ic}</span>{l}
         </a>
       ))}</nav>
+      <button className="theme-toggle" onClick={onToggleTheme}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
+        <span className="ico">{theme === 'dark' ? '☀' : '☾'}</span>
+        {theme === 'dark' ? 'Light theme' : 'Dark theme'}
+      </button>
       <div className="side-foot">Art Technology and Software</div>
     </aside>
   )
@@ -188,8 +193,13 @@ export default function App() {
   const [doing, setDoing] = useState(-1)
   const [preview, setPreview] = useState(null)
   const [view, setView] = useState('dashboard')
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
 
   useEffect(() => { getFiles().then(setMeta).catch((e) => console.error(e)) }, [])
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   async function handleRun() {
     setRunning(true); setResult(null); setVisible(0); setDoing(-1)
@@ -238,7 +248,8 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar view={view} onNavigate={setView} />
+      <Sidebar view={view} onNavigate={setView} theme={theme}
+               onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))} />
       <main className="main">
         <div className="topbar">
           <div>

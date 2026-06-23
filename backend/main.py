@@ -66,6 +66,21 @@ def _prune_keep(keep: set):
                 except OSError: pass
 
 
+def _ensure_fresh():
+    """Regenerate if the on-disk dataset isn't for today's target D1 — keeps a long-running host current
+    without a restart. No-op when already current (or AUTO_REGEN off). Called on each data request."""
+    if not AUTO_REGEN:
+        return
+    d1, _ = _target_dates()
+    nets = sorted(glob.glob(os.path.join(DATA_DIR, "VISA_SETTLEMENT_NET_*_*.json")))
+    current = None
+    if nets:
+        m = re.search(r"_(\d{8})\.json$", nets[-1])
+        current = m.group(1) if m else None
+    if current != d1:
+        _regenerate()
+
+
 @asynccontextmanager
 async def lifespan(app):
     _regenerate()
@@ -105,6 +120,7 @@ def health():
 
 @app.get("/api/files")
 def files():
+    _ensure_fresh()
     fp, items = _meta()
     with open(fp["visa_net"], encoding="utf-8") as f:
         net = json.load(f)
@@ -145,6 +161,7 @@ def preview(name: str):
 
 @app.post("/api/reconcile")
 def reconcile():
+    _ensure_fresh()
     findings = recon_core.run(DATA_DIR)        # deterministic: the numbers + where the differences are
     agent, agent_error = None, None
     if lyzr_client.is_configured():
