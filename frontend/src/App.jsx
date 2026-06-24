@@ -18,6 +18,20 @@ const catTotals = (cls) => {
   return t
 }
 
+// The agent is an LLM, so its output shape varies. Normalize defensively:
+//  - a step may arrive as {step,title,detail} OR as a plain "Title: detail" string
+//  - a classification item may omit `label` → fall back to a name derived from its `type`
+const TYPE_LABEL = { timing: 'Timing', fx: 'FX rate-timing', rounding: 'Rounding', isa: 'Scheme ISA', residual: 'Residual break' }
+const exLabel = (c) => c.label || TYPE_LABEL[c.type] || 'Difference'
+function normStep(s, i) {
+  if (s && typeof s === 'object') return { step: s.step ?? i + 1, title: s.title || `Step ${i + 1}`, detail: s.detail || '' }
+  const str = String(s ?? '')
+  const c = str.indexOf(':')
+  return (c > 0 && c < 42)
+    ? { step: i + 1, title: str.slice(0, c).trim(), detail: str.slice(c + 1).trim() }
+    : { step: i + 1, title: `Step ${i + 1}`, detail: str }
+}
+
 function Sidebar({ view, onNavigate, theme, onToggleTheme }) {
   return (
     <aside className="sidebar">
@@ -98,7 +112,7 @@ function Exceptions({ rows, visible }) {
       <tbody>
         {shown.map((c, i) => (
           <tr key={i} className={c.type === 'residual' ? 'res' : ''}>
-            <td><b>{c.label}</b>{c.arn && <div className="mono">{c.arn}</div>}</td>
+            <td><b>{exLabel(c)}</b>{c.arn && <div className="mono">{c.arn}</div>}</td>
             <td>{c.explanation}</td><td className="amt">{gbp(c.amount)}</td>
             <td><span className={`pill ${c.status}`}>{c.status === 'routed' ? 'escalated' : c.status}</span></td>
           </tr>
@@ -339,13 +353,14 @@ export default function App() {
             {hasAgent && (
               <>
                 <div className="steps">
-                  {ag.steps.map((s, i) => {
+                  {ag.steps.map((raw, i) => {
+                    const s = normStep(raw, i)
                     const isDone = i < visible, isDoing = i === doing
                     return (
-                      <div key={s.step} className={`step ${isDone ? 'on' : isDoing ? 'doing' : 'pending'}`}>
+                      <div key={i} className={`step ${isDone ? 'on' : isDoing ? 'doing' : 'pending'}`}>
                         <div className="num">{isDone ? '✓' : isDoing ? <span className="spin-d" /> : s.step}</div>
                         <div><div className="tl">{s.title}</div>
-                          {isDone && <div className="dt">{s.detail}</div>}
+                          {isDone && s.detail && <div className="dt">{s.detail}</div>}
                           {isDoing && <div className="dt"><i>analysing…</i></div>}</div>
                       </div>
                     )
