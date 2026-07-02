@@ -17,6 +17,7 @@ import glob, json, os, re
 CCY_EXP = {"826": 2, "978": 2, "840": 2, "392": 0}   # GBP, EUR, USD, JPY
 CCY_NAME = {"826": "GBP", "978": "EUR", "840": "USD", "392": "JPY"}
 FX_LABEL_THRESHOLD = Decimal("0.05")   # matched delta >= 5p is labelled FX (else absorbed in rounding)
+FX_VERIFY_TOLERANCE = Decimal("0.02")  # an FX-labelled gap must match source_amount x rate-diff within 2p, else it's routed
 
 def _money(minor: str, exp: int) -> Decimal:
     return (Decimal(int(minor)) / (Decimal(10) ** exp)).quantize(Decimal(10) ** -exp)
@@ -85,6 +86,17 @@ def parse_thredd_xml(path: str) -> list[dict]:
 def _f(d: Decimal) -> float:
     return float(d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
 
+def _fx_explained_by_rates(v: dict, delta: Decimal, thredd_rate) -> bool:
+    """True if a matched-amount gap is actually accounted for by the settlement-date (Visa) vs
+    transaction-date (processor) FX rates — i.e. delta ~= source_amount * (visa_rate - thredd_rate),
+    within FX_VERIFY_TOLERANCE. Needs the source amount + both rates; if any are missing we cannot
+    prove it's FX, so we return False and route the gap for review (e.g. a GBP item shouldn't have one)."""
+    src, vr = v.get("source_amount"), v.get("conv_rate")
+    if src is None or vr is None or not thredd_rate:
+        return False
+    expected = src * (vr - thredd_rate)
+    return abs(delta - expected) <= FX_VERIFY_TOLERANCE
+
 def reconcile(visa_recs, thredd_d1, thredd_d2, visa_net: Decimal) -> dict:
     """Produce the structured findings the agent will reason over (and the UI will render)."""
     d1 = {r["arn"]: r for r in thredd_d1}
@@ -97,13 +109,21 @@ def reconcile(visa_recs, thredd_d1, thredd_d2, visa_net: Decimal) -> dict:
         arn = v["arn"]
         if arn in d1:                                  # matched on the reconciled day
             delta = v["settle_gbp"] - d1[arn]["settlement_amt"]
-            fx_total += delta
-            status = "fx" if abs(delta) >= FX_LABEL_THRESHOLD else "matched"
-            if status == "fx":
-                fx.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
-                           "visa_amount": _f(v["settle_gbp"]), "thredd_amount": _f(d1[arn]["settlement_amt"]),
-                           "delta": _f(delta), "visa_rate": float(v["conv_rate"]) if v["conv_rate"] else None,
-                           "thredd_rate": float(d1[arn]["rate"]) if d1[arn]["rate"] else None})
+            tr = d1[arn]["rate"]
+            if abs(delta) >= FX_LABEL_THRESHOLD and not _fx_explained_by_rates(v, delta, tr):
+                # big enough to look like FX, but the rates do NOT account for it → unexplained, route it
+                residual_total += delta
+                residual.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
+                                 "amount": _f(delta), "note": "FX gap not explained by rates"})
+                status = "residual"
+            else:
+                fx_total += delta                       # genuine FX (rate-verified) or sub-threshold clean match
+                status = "fx" if abs(delta) >= FX_LABEL_THRESHOLD else "matched"
+                if status == "fx":
+                    fx.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
+                               "visa_amount": _f(v["settle_gbp"]), "thredd_amount": _f(d1[arn]["settlement_amt"]),
+                               "delta": _f(delta), "visa_rate": float(v["conv_rate"]) if v["conv_rate"] else None,
+                               "thredd_rate": float(tr) if tr else None})
             transactions.append({"arn": arn, "merchant": v["merchant"], "source_ccy": v["source_ccy"],
                                  "region": v["region"], "visa_amount": _f(v["settle_gbp"]),
                                  "thredd_amount": _f(d1[arn]["settlement_amt"]), "gap": _f(delta), "status": status})
