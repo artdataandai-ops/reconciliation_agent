@@ -14,7 +14,7 @@ const maskName = (n) => (n ? n.replace('THREDD_TXN_REPORT', 'PROCESSOR_TXN_REPOR
 const REVEAL = { raw: 1, timing: 3, fx: 4, rounding: 4, explained: 4, isa: 5, residual: 5 }
 const NAV = [
   ['▤', 'Activity Reconciliation', 'activity'],
-  ['▦', 'Dashboard', 'dashboard'], ['⇄', 'Reconciliation', 'reconciliation'],
+  ['▦', 'Reconciliation Agent', 'dashboard'], ['⇄', 'Transactions', 'reconciliation'],
 ]
 
 const catTotals = (cls) => {
@@ -205,7 +205,7 @@ function ReconciliationView({ result, selectedDay, onBack }) {
 function ActivityView({ rows, result, onOpenDay }) {
   const [filter, setFilter] = useState('all')
   if (!rows) return (
-    <section className="card panel"><h2>Activity Reconciliation</h2><div className="empty">Loading…</div></section>
+    <section className="card panel"><div className="empty">Loading…</div></section>
   )
   const ranDay = result?.findings?.dates?.reconciled_day
   const residual = result?.findings?.facts?.residual?.total
@@ -214,7 +214,7 @@ function ActivityView({ rows, result, onOpenDay }) {
   const nBreak = rows.filter((r) => r.status === 'unreconciled').length
   return (
     <section className="card panel">
-      <h2>Activity Reconciliation <span className="muted">{rows.length} settlement records · {nBreak} unreconciled</span></h2>
+      <h2><span className="muted">{rows.length} settlement records · {nBreak} unreconciled</span></h2>
       <div className="txn-filter">
         {[['all', 'All'], ['reconciled', 'Reconciled'], ['break', 'Unreconciled']].map(([f, lbl]) => (
           <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{lbl}</button>
