@@ -61,8 +61,8 @@ def _prune_keep(keep: set):
     for p in glob.glob(os.path.join(DATA_DIR, "*")):
         b = os.path.basename(p)
         if b.startswith(prefixes):
-            m = re.search(r"(\d{8})", b)
-            if m and m.group(1) not in keep:
+            m = re.search(r"_(\d{8})\.\w+$", b)   # the date is the 8 digits before the extension
+            if m and m.group(1) not in keep:      # (not any 8-digit run — the 10-digit SRE contains one)
                 try: os.remove(p)
                 except OSError: pass
 
