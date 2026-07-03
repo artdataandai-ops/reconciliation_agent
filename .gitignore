@@ -67,7 +67,6 @@ pnpm-debug.log*
 # ─────────────────────────────────────────────────────────────
 # Generated data (output of gen_unrecon_day.py; AUTO_REGEN recreates it)
 # ─────────────────────────────────────────────────────────────
-data/
 
 # ─────────────────────────────────────────────────────────────
 # Archive (reference docs / binaries — not source)

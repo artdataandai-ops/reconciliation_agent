@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Transactions reportDate="20260703" sre="5359282076">
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10003</FinId>
+    <PresentmentID>20003</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000400</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260703</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732509633508" MaskedPAN="476173******3508" product="DBT"/>
+    <Account no="GB2509633508" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="230.00" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="230.00" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100003" Retrefno="742205051010"/>
+    <MerchCode>JOHN LEWIS 0031</MerchCode>
+    <Term code="TERM0001" location="JOHN LEWIS 0031" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="230.00" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000400</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10011</FinId>
+    <PresentmentID>20011</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000001200</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260703</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732837553516" MaskedPAN="476173******3516" product="DBT"/>
+    <Account no="GB2837553516" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="60.00" currency="978"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="50.60" currency="826" rate="0.843271000"/>
+    <ApprCode>970001</ApprCode>
+    <Trace auditno="100011" Retrefno="742205051010"/>
+    <MerchCode>H&amp;M BERLIN</MerchCode>
+    <Term code="TERM0001" location="H&amp;M BERLIN" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.25" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="50.60" currency="826" rate="0.843271000"/>
+    <ARN>74220505101000000001200</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+</Transactions>

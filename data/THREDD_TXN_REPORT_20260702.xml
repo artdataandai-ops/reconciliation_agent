@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Transactions reportDate="20260702" sre="5359282076">
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10000</FinId>
+    <PresentmentID>20000</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000100</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732386663505" MaskedPAN="476173******3505" product="DBT"/>
+    <Account no="GB2386663505" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="45.00" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="45.00" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100000" Retrefno="742205051010"/>
+    <MerchCode>TESCO STORES 2245</MerchCode>
+    <Term code="TERM0001" location="TESCO STORES 2245" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="45.00" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000100</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10001</FinId>
+    <PresentmentID>20001</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000200</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732427653506" MaskedPAN="476173******3506" product="DBT"/>
+    <Account no="GB2427653506" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="120.50" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="120.50" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100001" Retrefno="742205051010"/>
+    <MerchCode>ARGOS RETAIL 0098</MerchCode>
+    <Term code="TERM0001" location="ARGOS RETAIL 0098" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="120.50" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000200</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10002</FinId>
+    <PresentmentID>20002</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000300</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732468643507" MaskedPAN="476173******3507" product="DBT"/>
+    <Account no="GB2468643507" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="8.99" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="8.99" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100002" Retrefno="742205051010"/>
+    <MerchCode>GREGGS 1042</MerchCode>
+    <Term code="TERM0001" location="GREGGS 1042" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="8.99" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000300</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10004</FinId>
+    <PresentmentID>20004</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000500</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732550623509" MaskedPAN="476173******3509" product="DBT"/>
+    <Account no="GB2550623509" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="15.75" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="15.75" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100004" Retrefno="742205051010"/>
+    <MerchCode>PRET A MANGER 88</MerchCode>
+    <Term code="TERM0001" location="PRET A MANGER 88" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="15.75" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000500</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10005</FinId>
+    <PresentmentID>20005</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000600</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732591613510" MaskedPAN="476173******3510" product="DBT"/>
+    <Account no="GB2591613510" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="67.20" currency="826"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="67.20" currency="826" rate="1.000000000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100005" Retrefno="742205051010"/>
+    <MerchCode>SAINSBURYS 1190</MerchCode>
+    <Term code="TERM0001" location="SAINSBURYS 1190" street="1 High St" city="NAT" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="70" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.00" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="67.20" currency="826" rate="1.000000000"/>
+    <ARN>74220505101000000000600</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5411"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10006</FinId>
+    <PresentmentID>20006</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000700</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732632603511" MaskedPAN="476173******3511" product="DBT"/>
+    <Account no="GB2632603511" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="100.00" currency="978"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="84.33" currency="826" rate="0.843271000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100006" Retrefno="742205051010"/>
+    <MerchCode>ZARA MADRID</MerchCode>
+    <Term code="TERM0001" location="ZARA MADRID" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.42" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="84.33" currency="826" rate="0.843271000"/>
+    <ARN>74220505101000000000700</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10007</FinId>
+    <PresentmentID>20007</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000800</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732673593512" MaskedPAN="476173******3512" product="DBT"/>
+    <Account no="GB2673593512" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="250.00" currency="840"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="198.15" currency="826" rate="0.792618000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100007" Retrefno="742205051010"/>
+    <MerchCode>BEST BUY NYC</MerchCode>
+    <Term code="TERM0001" location="BEST BUY NYC" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.99" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="198.15" currency="826" rate="0.792618000"/>
+    <ARN>74220505101000000000800</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10008</FinId>
+    <PresentmentID>20008</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000000900</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732714583513" MaskedPAN="476173******3513" product="DBT"/>
+    <Account no="GB2714583513" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="80.00" currency="978"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="67.46" currency="826" rate="0.843271000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100008" Retrefno="742205051010"/>
+    <MerchCode>FNAC PARIS</MerchCode>
+    <Term code="TERM0001" location="FNAC PARIS" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.34" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="67.46" currency="826" rate="0.843271000"/>
+    <ARN>74220505101000000000900</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10009</FinId>
+    <PresentmentID>20009</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000001000</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732755573514" MaskedPAN="476173******3514" product="DBT"/>
+    <Account no="GB2755573514" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="500.00" currency="840"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="396.31" currency="826" rate="0.792618000"/>
+    <ApprCode>970000</ApprCode>
+    <Trace auditno="100009" Retrefno="742205051010"/>
+    <MerchCode>APPLE STORE SF</MerchCode>
+    <Term code="TERM0001" location="APPLE STORE SF" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="1.98" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="396.31" currency="826" rate="0.792618000"/>
+    <ARN>74220505101000000001000</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10010</FinId>
+    <PresentmentID>20010</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000001100</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732796563515" MaskedPAN="476173******3515" product="DBT"/>
+    <Account no="GB2796563515" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="15000" currency="392"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="78.81" currency="826" rate="0.005253700"/>
+    <ApprCode>970001</ApprCode>
+    <Trace auditno="100010" Retrefno="742205051010"/>
+    <MerchCode>BIC CAMERA TOKYO</MerchCode>
+    <Term code="TERM0001" location="BIC CAMERA TOKYO" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.39" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="78.81" currency="826" rate="0.005253700"/>
+    <ARN>74220505101000000001100</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+  <CardFinancial>
+    <RecordType>ADV</RecordType>
+    <FinId>10013</FinId>
+    <PresentmentID>20013</PresentmentID>
+    <Traceid_Lifecycle>74220505101000000001400</Traceid_Lifecycle>
+    <LocalDate>20260702120000</LocalDate>
+    <SettlementDate>20260702</SettlementDate>
+    <SchemeSettlementDate>20260702</SchemeSettlementDate>
+    <SchemeReconciliationDate>20260702</SchemeReconciliationDate>
+    <CycleNumber>01</CycleNumber>
+    <Card PAN="4761732919533518" MaskedPAN="476173******3518" product="DBT"/>
+    <Account no="GB2919533518" type="02"/>
+    <TxnCode direction="debit" Type="pos" Group="pos"/>
+    <TxnAmt value="33.33" currency="978"/>
+    <CashbackAmt value="0.00" currency="826"/>
+    <BillAmt value="28.11" currency="826" rate="0.843271000"/>
+    <ApprCode>970001</ApprCode>
+    <Trace auditno="100013" Retrefno="742205051010"/>
+    <MerchCode>LIDL DUBLIN</MerchCode>
+    <Term code="TERM0001" location="LIDL DUBLIN" street="1 High St" city="INTL" country="GB"/>
+    <Schema>VISA</Schema>
+    <Txn/>
+    <MsgSource value="54" domesticMaestro="no"/>
+    <Fee direction="debit" value="0.00" currency="826"/>
+    <FeeAmt direction="debit" value="0.14" currency="826"/>
+    <FeeClass interchangeTransaction="no" type="2" code="1"/>
+    <SettlementAmt value="28.11" currency="826" rate="0.843271000"/>
+    <ARN>74220505101000000001400</ARN>
+    <FIID>4761730000</FIID>
+    <RIID>4220500000</RIID>
+    <ReasonCode>0000</ReasonCode>
+    <Classification MCC="5732"/>
+    <Response approved="yes"/>
+    <CCAAmount value="0.00" currency="826" included="no"/>
+  </CardFinancial>
+</Transactions>
