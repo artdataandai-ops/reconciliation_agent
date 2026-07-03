@@ -7,7 +7,7 @@ set -e
 # Usage: bash /var/www/apps/reconciliation-agent/deploy.sh
 # ============================================
 
-DEPLOY_DIR="/var/www/apps/reconciliation-agent"
+DEPLOY_DIR="/var/www/apps/reconciliation_agent"
 COMPOSE_FILE="$DEPLOY_DIR/docker-compose.yml"
 
 echo "=========================================="
