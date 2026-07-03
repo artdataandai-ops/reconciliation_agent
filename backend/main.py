@@ -107,15 +107,15 @@ def _meta():
     fp = recon_core.discover(DATA_DIR)
     def info(path, side, kind, day):
         n = 0
-        if path.endswith(".txt"):
+        if path.endswith(".itf"):
             n = len(recon_core.parse_visa_baseii(path))
         elif path.endswith(".xml"):
             n = len(recon_core.parse_thredd_xml(path))
         return {"name": os.path.basename(path), "side": side, "kind": kind, "day": day,
                 "records": n, "bytes": os.path.getsize(path), "status": "received"}
     return fp, [
-        info(fp["visa_dom"],  "Visa",   "Domestic clearing (BASE II)",      fp["d1"]),
-        info(fp["visa_intl"], "Visa",   "International clearing (BASE II)",  fp["d1"]),
+        info(fp["visa_nat"],  "Visa",   "National clearing (BASE II — ITF)",      fp["d1"]),
+        info(fp["visa_intl"], "Visa",   "International clearing (BASE II — ITF)",  fp["d1"]),
         info(fp["thredd_d1"], "Processor", "Transaction XML report",   fp["d1"]),
         info(fp["thredd_d2"], "Processor", "Transaction XML report",   fp["d2"]),
     ]
@@ -141,7 +141,7 @@ def preview(name: str):
     path = os.path.join(DATA_DIR, name)
     if not os.path.isfile(path):
         raise HTTPException(404, f"{name} not found")
-    if name.endswith(".txt"):       # Visa BASE II → decoded rows (never raw-dumped)
+    if name.endswith(".itf"):       # Visa BASE II — ITF → decoded rows (never raw-dumped)
         recs = recon_core.parse_visa_baseii(path)
         rows = [{"arn": r["arn"], "merchant": r["merchant"], "region": r["region"],
                  "source_ccy": r["source_ccy"],

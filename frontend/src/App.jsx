@@ -134,7 +134,9 @@ const TXN_STATUS = {
   residual:      { label: 'Unreconciled',            bucket: 'break' },
   platform_only: { label: 'Unreconciled · platform', bucket: 'break' },
 }
-const svc = (region) => (region === 'INTL' ? 'International' : region === 'DOM' ? 'National' : '—')
+const svc = (region) => (region === 'INTL' ? 'International' : region === 'NAT' ? 'National' : '—')
+// Friendlier headers for the file-preview tables (data keys are unchanged)
+const PREVIEW_LABELS = { settlement_amt: 'Net Processed', settle_gbp: 'Net Settlement' }
 
 // Per-day transaction detail. Reached by clicking an Activity row (or the sidebar).
 //  - a reconciled history day → its mock transactions (amounts in that day's settlement currency)
@@ -174,7 +176,7 @@ function ReconciliationView({ result, selectedDay, onBack }) {
           <th style={{ textAlign: 'right' }}>Net Settlement</th>
           <th style={{ textAlign: 'right' }}>Gap</th>
           <th style={{ textAlign: 'right' }}>Net Processed</th>
-          <th>Ccy</th><th>Service</th>
+          <th>Ccy</th><th>Clearing</th>
         </tr></thead>
         <tbody>
           {rows.map((t, i) => {
@@ -265,7 +267,7 @@ function PreviewModal({ name, data, onClose }) {
           {data?.raw_sample && (<><div className="note" style={{ marginTop: 0, marginBottom: 6 }}>Raw BASE II (decoded below):</div><div className="raw">{data.raw_sample.join('\n')}</div></>)}
           {data?.rows && (
             <table className="x">
-              <thead><tr>{data.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+              <thead><tr>{data.columns.map((c) => <th key={c}>{PREVIEW_LABELS[c] ?? c}</th>)}</tr></thead>
               <tbody>{data.rows.map((r, i) => <tr key={i}>{data.columns.map((c) => <td key={c} className={typeof r[c] === 'number' ? 'amt' : ''}>{String(r[c] ?? '')}</td>)}</tr>)}</tbody>
             </table>
           )}
@@ -353,11 +355,11 @@ export default function App() {
           <div>
             {view === 'activity' && <>
               <h1>Activity Reconciliation</h1>
-              <div className="sub">{meta ? <>Recent settlement activity · SRE {meta.sre}</> : 'Loading…'}</div>
+              <div className="sub">{meta ? <>Recent settlement activity</> : 'Loading…'}</div>
             </>}
             {view === 'dashboard' && <>
               <h1>Daily Settlement Reconciliation</h1>
-              <div className="sub">{meta ? <>Settlement day <b>{fmtDay(meta.reconciled_day)}</b> · SRE {meta.sre} · catch-up file {fmtDay(meta.catch_up_day)}</> : 'Loading…'}</div>
+              <div className="sub">{meta ? <>Settlement day <b>{fmtDay(meta.reconciled_day)}</b> · catch-up file {fmtDay(meta.catch_up_day)}</> : 'Loading…'}</div>
             </>}
             {view === 'reconciliation' && <>
               <h1>Transaction Detail</h1>

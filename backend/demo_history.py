@@ -100,7 +100,7 @@ def build_history(reconciled_day: str, days: int = 10) -> list[dict]:
     counter = 0
     for offset, ccy, service, items in _TEMPLATE:
         date = (base - _dt.timedelta(days=offset)).strftime("%Y%m%d")
-        region = "INTL" if service == "International" else "DOM"
+        region = "INTL" if service == "International" else "NAT"
         txns = []
         total = Decimal("0")
         for merch, amt in items:

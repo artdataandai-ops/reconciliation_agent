@@ -6,10 +6,10 @@ Dates are dynamic: D1 (reconciled day) = as-of - 1, D2 (catch-up) = as-of (defau
 Run `python gen_unrecon_day.py --as-of YYYY-MM-DD` to pin the demo date.
 
 Produces (with <D1>/<D2> = YYYYMMDD):
-  Scheme side (Visa BASE II clearing, representative fixed-width + readable CSV):
-    VISA_CLR_DOM_711520_<D1>.txt   / clearing_detail_DOM_711520_<D1>.csv
-    VISA_CLR_INTL_711520_<D1>.txt  / clearing_detail_INTL_711520_<D1>.csv
-    VISA_SETTLEMENT_NET_711520_<D1>.json   (VSS definitive net settlement figure)
+  Scheme side (Visa BASE II — ITF clearing, representative fixed-width + readable CSV):
+    VISA_CLR_NAT_5359282076_<D1>.itf   / clearing_detail_NAT_5359282076_<D1>.csv
+    VISA_CLR_INTL_5359282076_<D1>.itf  / clearing_detail_INTL_5359282076_<D1>.csv
+    VISA_SETTLEMENT_NET_5359282076_<D1>.json   (VSS definitive net settlement figure)
   Platform side (Thredd Transaction XML Report, conforms to the XSD):
     THREDD_TXN_REPORT_<D1>.xml  (D1 - short by late txns)
     THREDD_TXN_REPORT_<D2>.xml  (D2 - late txns appear here)
@@ -34,7 +34,7 @@ os.makedirs(OUT, exist_ok=True)
 _asof = date.fromisoformat(_args.as_of) if _args.as_of else date.today()
 D1 = (_asof - timedelta(days=1)).strftime("%Y%m%d")   # the unreconciled day (Thredd D1 is short)
 D2 = _asof.strftime("%Y%m%d")                          # catch-up day (late txns land here)
-SRE = "711520"            # Funds Transfer Settlement Reporting Entity
+SRE = "5359282076"        # Funds Transfer Settlement Reporting Entity (FTSRE, 10-digit)
 ACQ_BIN, ISS_BIN = "422050", "476173"
 ISA_RATE = Decimal("0.005")   # 0.5% International Service Assessment (equal both sides)
 
@@ -53,12 +53,12 @@ def gbp(v):   # 2dp GBP
 # ---------------------------------------------------------------------------
 TXN = [
   # id          region ccy   amount      trate         srate         scen   merchant
-  ("DOM-001","DOM","GBP","45.00",   "1","1","NORMAL","TESCO STORES 2245"),
-  ("DOM-002","DOM","GBP","120.50",  "1","1","NORMAL","ARGOS RETAIL 0098"),
-  ("DOM-003","DOM","GBP","8.99",    "1","1","NORMAL","GREGGS 1042"),
-  ("DOM-004","DOM","GBP","230.00",  "1","1","A",     "JOHN LEWIS 0031"),
-  ("DOM-005","DOM","GBP","15.75",   "1","1","NORMAL","PRET A MANGER 88"),
-  ("DOM-006","DOM","GBP","67.20",   "1","1","NORMAL","SAINSBURYS 1190"),
+  ("DOM-001","NAT","GBP","45.00",   "1","1","NORMAL","TESCO STORES 2245"),
+  ("DOM-002","NAT","GBP","120.50",  "1","1","NORMAL","ARGOS RETAIL 0098"),
+  ("DOM-003","NAT","GBP","8.99",    "1","1","NORMAL","GREGGS 1042"),
+  ("DOM-004","NAT","GBP","230.00",  "1","1","A",     "JOHN LEWIS 0031"),
+  ("DOM-005","NAT","GBP","15.75",   "1","1","NORMAL","PRET A MANGER 88"),
+  ("DOM-006","NAT","GBP","67.20",   "1","1","NORMAL","SAINSBURYS 1190"),
   ("INTL-001","INTL","EUR","100.00","0.843271","0.843271","NORMAL","ZARA MADRID"),
   ("INTL-002","INTL","USD","250.00","0.792618","0.792618","NORMAL","BEST BUY NYC"),
   ("INTL-003","INTL","EUR","80.00", "0.843271","0.857000","B",     "FNAC PARIS"),
@@ -86,7 +86,7 @@ for i, (tid, region, ccy, amt, trate, srate, scen, merch) in enumerate(TXN, 1):
         trate=trate, srate=srate, thredd_gbp=thredd_gbp, visa_gbp=visa_gbp,
         exact_visa=exact_visa, isa=isa, scen=scen, merch=merch, arn=arn, pan=pan,
         masked=pan[:6] + "******" + pan[-4:],
-        mcc={"DOM":"5411","INTL":"5732"}[region],
+        mcc={"NAT":"5411","INTL":"5732"}[region],
         # presence
         in_thredd_d1 = scen in ("NORMAL", "B"),
         in_thredd_d2 = scen == "A",
@@ -149,7 +149,7 @@ def write_visa_clearing(region, fname):
     with open(path,"w",newline="\n") as f:
         f.write("\n".join(lines)+"\n")
     # readable CSV companion
-    csvpath = os.path.join(OUT, fname.replace("VISA_CLR_","clearing_detail_").replace(".txt",".csv"))
+    csvpath = os.path.join(OUT, fname.replace("VISA_CLR_","clearing_detail_").replace(".itf",".csv"))
     with open(csvpath,"w",newline="") as f:
         w = csv.writer(f)
         w.writerow(["tid","tc","arn","masked_pan","merchant","txn_ccy","txn_amount",
@@ -218,8 +218,8 @@ def write_thredd(fname, selector, settle_date):
     return path, len(sel)
 
 # ---- generate (filenames carry the dynamic dates) ----
-v1 = write_visa_clearing("DOM",  f"VISA_CLR_DOM_{SRE}_{D1}.txt")
-v2 = write_visa_clearing("INTL", f"VISA_CLR_INTL_{SRE}_{D1}.txt")
+v1 = write_visa_clearing("NAT",  f"VISA_CLR_NAT_{SRE}_{D1}.itf")
+v2 = write_visa_clearing("INTL", f"VISA_CLR_INTL_{SRE}_{D1}.itf")
 t1 = write_thredd(f"THREDD_TXN_REPORT_{D1}.xml", lambda r: r["in_thredd_d1"], D1)
 t2 = write_thredd(f"THREDD_TXN_REPORT_{D2}.xml", lambda r: r["in_thredd_d2"], D2)
 

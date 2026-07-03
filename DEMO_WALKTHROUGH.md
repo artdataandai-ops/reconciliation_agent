@@ -27,7 +27,7 @@
 | **VSS** | Visa Settlement Service | Visa's official document stating the single **net** amount for the day — the definitive figure |
 | **Net settlement** | — | One bottom-line number for the whole day (not a list) |
 | **Clearing** | — | The detailed, transaction-by-transaction file Visa sends (the line items behind the net) |
-| **BASE II** | — | The format of Visa's clearing files — a fixed-width text layout (each field sits at fixed character positions) |
+| **BASE II — ITF** | — | The format of Visa's clearing files — a fixed-width text layout delivered as `.itf` (ITF) files (each field sits at fixed character positions) |
 | **ARN** | Acquirer Reference Number | The **unique ID** that follows a single transaction across both Visa and Thredd. This is how we match the two sides |
 | **FX** | Foreign Exchange | Currency conversion (e.g. euros → pounds) |
 | **Rate-timing** | — | Visa and Thredd apply the exchange rate on **different dates**, so the converted pound amount differs slightly |
@@ -96,7 +96,7 @@
 ## 4. The architecture — three parts, one key idea
 
 ```
-  Visa BASE II clearing files (Domestic + International) ┐
+  Visa BASE II clearing files (National + International) ┐
   + Visa VSS net settlement number                      ├─▶  Backend (calculator) ─▶ Lyzr AI agent (brain) ─▶ React dashboard (story)
   Thredd Transaction XML report (Day 1 + Day 2)         ┘     parses · matches · computes   classifies · explains · routes   shows it
 ```
@@ -126,8 +126,8 @@ A dashboard (built with React) that shows the files arriving, plays the agent's 
 
 | File you'll see | Side | Format | What it is |
 |---|---|---|---|
-| `VISA_CLR_DOM_…` | Visa | BASE II (fixed-width text) | **Dom**estic (UK, GBP) clearing for Day 1 |
-| `VISA_CLR_INTL_…` | Visa | BASE II (fixed-width text) | **Int**ernationa**l** clearing for Day 1 (has currency conversion + ISA fees) |
+| `VISA_CLR_NAT_…` | Visa | BASE II — ITF (fixed-width text) | **Nat**ional (UK, GBP) clearing for Day 1 |
+| `VISA_CLR_INTL_…` | Visa | BASE II — ITF (fixed-width text) | **Int**ernationa**l** clearing for Day 1 (has currency conversion + ISA fees) |
 | `THREDD_TXN_REPORT_…(Day 1)` | Thredd | XML | Our platform's Day-1 report — it is **short** by the late transactions |
 | `THREDD_TXN_REPORT_…(Day 2)` | Thredd | XML | Our platform's **next-day** report — the late transactions land here |
 
@@ -239,18 +239,80 @@ day. The five scenarios below are the interesting part.
 | …0900 | FNAC PARIS (EUR 80.00) | 68.56 | 67.46 | £1.10 |
 | …1000 | APPLE STORE SF (USD 500.00) | 402.50 | 396.31 | £6.19 |
 
-**How the engine classifies it:** these ARNs match on both sides same-day, but the amounts differ. Any matched difference of **5 pence or more** is classified as **FX rate-timing** and cleared as an expected, within-tolerance difference.
-
 **Total:** £1.10 + £6.19 = **£7.29.**
 
-> **Say:** "These aren't errors — they're the normal, expected consequence of Visa and our
-> platform stamping the exchange rate on slightly different dates. The system recognises them
-> and clears them."
+#### Where does the difference come from? (nobody made a mistake)
 
-*(Note for you, not the client: on the published version, a 5p-or-larger matched difference is
-labelled FX and cleared. There is a more advanced version in development that additionally
-re-derives each FX difference from the two rates to double-check it — but that is **not** in the
-published build, so don't claim it during the demo.)*
+This is the point to be crystal clear on: **both Visa and Thredd did their maths perfectly.** They
+just used **different exchange rates**, because exchange rates change day to day and the two sides
+convert on different dates:
+
+- **Thredd** converts on the **transaction date** (the day the card was tapped) → uses that day's rate.
+- **Visa** converts on the **settlement date** (a day or two later, when money actually moves) → uses that day's rate.
+
+Same purchase, both multiply correctly, but a different rate goes in — so a slightly different
+number of pounds comes out. Using APPLE STORE SF ($500.00):
+
+```
+Thredd:  $500 × 0.792618 (transaction-date rate) = £396.31   ← correct maths
+Visa:    $500 × 0.805000 (settlement-date rate)  = £402.50   ← also correct maths
+                                                   ─────────
+difference                                         = £6.19
+```
+
+> **Analogy to say if asked:** "It's like you and a friend buying the same $500 gadget, but you pay
+> Monday and they pay Wednesday. Both banks use the correct rate, but the rate shifted midweek, so
+> the pound bills differ. Neither bank erred — it's *when* the conversion happened, not *how*."
+
+This is normal and expected on **every** cross-border transaction, which is why the system's job is
+to *recognise* it, not eliminate it.
+
+#### How the engine classifies it — two separate numbers (don't mix them up)
+
+**The 5-pence (5p) threshold — "is this difference big enough to bother with?"**
+For every matched transaction the engine computes the difference in pounds and compares it to a **5p cutoff**:
+
+- difference **5p or more** → worth flagging as **FX**.
+- difference **under 5p** → treat as a clean match; the stray pennies just fall into the rounding bucket.
+
+Note this is a **comparison**, not a conversion — the £1.10 difference isn't "becoming" 5p. Put both
+on the same scale to see it: £1.10 is **110 pence**, the cutoff is **5 pence**, so 110p easily clears
+5p. (Every normal transaction has a difference of £0.00 = 0p, which is under 5p → clean match.)
+
+**The 2-pence (2p) verification — "do the rates actually prove it's FX?"**
+Clearing the 5p bar only means the difference is *worth checking*. The engine then **re-derives** the
+difference from the two rates and confirms it matches, before clearing it:
+
+```
+predicted difference = source amount × (Visa's rate − Thredd's rate)
+
+FNAC:  €80  × (0.857000 − 0.843271) = £1.0983  vs observed £1.10  → agree ✓
+APPLE: $500 × (0.805000 − 0.792618) = £6.1910  vs observed £6.19  → agree ✓
+accept as FX if | observed − predicted | ≤ 2p
+```
+
+If the rates account for the difference (within 2p) → **cleared as FX**. If they **don't** — or the
+source amount / rate is missing (e.g. a plain GBP item that shouldn't have a conversion) — the engine
+**cannot prove it's FX, so it routes it to a human** as a possible break instead of clearing it. That
+is how we know it's genuinely a rate difference and not something else (a fee, a partial refund, a
+keyed-in error) that happened to be a similar size.
+
+> **The 2p is NOT a cap on how big an FX difference can be.** It's the allowed gap between the
+> *observed* difference and the *predicted* difference — and those only ever disagree by a rounding
+> penny, no matter how large the transaction. So a genuine £6, £60 or £600 FX difference all pass;
+> only differences the rates *can't* explain get flagged.
+
+**The two numbers side by side:**
+
+| Number | Question it answers | Below it → | Above it → |
+|---|---|---|---|
+| **5p** (label threshold) | Is the difference big enough to call FX at all? | clean match (→ rounding) | worth checking as FX |
+| **2p** (verify tolerance) | Do the rates actually explain the difference? | escalate — rates can't prove it | cleared as genuine FX |
+
+> **Say:** "These aren't errors — they're the normal, expected result of Visa and our platform
+> stamping the exchange rate on slightly different dates. The system doesn't just assume that,
+> though — it re-does the conversion from both rates and only clears the difference if the rates
+> actually account for it. Anything they can't explain goes to a human instead."
 
 ---
 
@@ -322,7 +384,11 @@ timing = sum of Visa amounts whose ARN turns up in the Thredd Day-2 file
 
 ### Step 3 — FX rate-timing
 ```
-FX = sum of the pound differences on matched cross-border transactions (each ≥ 5p)
+Each difference is re-derived from the two rates to confirm it's genuinely FX:
+  FNAC:  €80  × (0.857000 − 0.843271) = £1.0983  ≈ observed £1.10  ✓ (within 2p)
+  APPLE: $500 × (0.805000 − 0.792618) = £6.1910  ≈ observed £6.19  ✓ (within 2p)
+
+FX = sum of the confirmed pound differences on matched cross-border transactions (each ≥ 5p)
    = 1.10 (FNAC)  +  6.19 (Apple)
    = £7.29
 ```
@@ -398,9 +464,16 @@ timing + FX + rounding + residual  =  raw difference
 > only ever real work."
 
 **"How do you know a currency difference isn't hiding a real problem?"**
-> "The cross-border differences here are the normal, expected result of the rate being stamped on
-> different dates, and they're within tolerance. Anything genuinely unexplained ends up in the
-> residual and gets escalated — like the Uber transaction."
+> "We don't just assume it. The engine re-derives each difference from the two exchange rates —
+> the amount times the rate change — and only clears it if the rates actually account for it,
+> within a 2p tolerance. If they can't explain it, it's treated as a possible break and escalated
+> to a human, just like the Uber transaction."
+
+**"Isn't 2p too tight — what if a real currency difference is bigger than 2p?"**
+> "The 2p isn't a limit on the size of the difference — a genuine £6, £60 or £600 FX difference all
+> pass. It's the allowed gap between the difference we *see* and the difference the rates *predict*,
+> and those only ever disagree by a rounding penny however large the transaction. Only differences
+> the rates genuinely can't explain exceed it."
 
 ---
 

@@ -11,11 +11,11 @@ transaction embodies which exception.** All data is synthetic. Regenerate any ti
 
 ```
    VISA  ───sends 2 BASE II clearing files──▶  THREDD  ───sends XML report──▶  ISSUER
-  (scheme truth)        Domestic + International       (platform record)       (you reconcile)
+  (scheme truth)        National + International       (platform record)       (you reconcile)
 ```
 
-- **Scheme side (Visa)** = what Visa cleared. Comes as **fixed-width BASE II** files (TC records),
-  split **Domestic** and **International**, daily.
+- **Scheme side (Visa)** = what Visa cleared. Comes as **fixed-width BASE II — ITF** files (TC records),
+  split **National** and **International**, daily.
 - **Platform side (Thredd)** = what the issuer platform posted. Comes as the **Transaction XML
   Report** (the XSD), one file per day via sFTP.
 - **Reconcile** = match the two on **ARN**; the day's difference must be *explained*.
@@ -24,16 +24,16 @@ transaction embodies which exception.** All data is synthetic. Regenerate any ti
 
 | File | Side | Format | What it is |
 |------|------|--------|-----------|
-| `VISA_CLR_DOM_711520_20250401.txt` | Visa | BASE II fixed-width | Domestic GBP clearing, Day 1 (no FX) |
-| `VISA_CLR_INTL_711520_20250401.txt` | Visa | BASE II fixed-width | International clearing, Day 1 (FX via TCR1, ISA) |
-| `clearing_detail_DOM_…csv` / `…INTL_…csv` | Visa | CSV | Readable decode of the two `.txt` files |
+| `VISA_CLR_NAT_5359282076_20250401.itf` | Visa | BASE II — ITF fixed-width | National GBP clearing, Day 1 (no FX) |
+| `VISA_CLR_INTL_5359282076_20250401.itf` | Visa | BASE II — ITF fixed-width | International clearing, Day 1 (FX via TCR1, ISA) |
+| `clearing_detail_NAT_…csv` / `…INTL_…csv` | Visa | CSV | Readable decode of the two `.itf` files |
 | `THREDD_TXN_REPORT_20250401.xml` | Thredd | XML (per XSD) | Platform Day-1 report — **short** by late txns |
 | `THREDD_TXN_REPORT_20250402.xml` | Thredd | XML (per XSD) | Platform Day-2 report — late txns land here |
 
 **Why 2 Thredd files?** Same daily report on two consecutive days. The *primary* cause (timing) is a
 transaction that slips from Day 1 into Day 2 — you need both days to prove "delayed, not lost".
 
-**BASE II record types in the `.txt`:** `TC90` = file header · `TC05` = sales draft (TCR0 = core,
+**BASE II — ITF record types in the `.itf`:** `TC90` = file header · `TC05` = sales draft (TCR0 = core,
 TCR1 = FX/currency-conversion component) · `TC92` = file trailer. *(Representative of the proprietary
 Visa BASE II layout; recon matches on ARN/amounts/dates, not byte positions.)*
 
@@ -78,7 +78,7 @@ Same ARN, one day later = posting delay.
 | `BillAmt` (value, rate) | amount billed in **GBP** at the **transaction-date** rate | platform's FX view |
 | `SettlementAmt` (value, rate) | GBP settled (Visa: = BillAmt unless multicurrency BIN) | compared vs Visa clearing amount |
 | `FeeAmt` + `FeeClass` | scheme/programme fee (here **ISA**, type 2) | Step 5 confirms it nets to 0 |
-| `MsgSource` | `54` = Visa **International**, else domestic | tags dom/intl |
+| `MsgSource` | `54` = Visa **International**, else national | tags nat/intl |
 | `CycleNumber` | Mastercard-only (Visa has no cycles) | placeholder `01` for Visa rows |
 
 ## 6. Regenerate & sources

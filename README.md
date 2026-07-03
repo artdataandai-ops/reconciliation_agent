@@ -5,7 +5,7 @@ settlement and the Thredd platform transaction file, explained in seconds and wi
 breaks routed to an analyst.
 
 ```
-  Visa BASE II files (Domestic + International) ┐
+  Visa BASE II files (National + International) ┐
   + Visa net settlement (VSS)                  ├─▶  FastAPI backend  ─▶  Lyzr agent  ─▶  React dashboard
   Thredd Transaction XML (Day 1 + Day 2)       ┘    parse · match ARN     classify ·       files · waterfall ·
                                                      · compute (exact)     narrate · route   exceptions · run log
@@ -83,5 +83,5 @@ residual (or no tool configured) nothing is shown. See [lyzr_agent_prompt.md](ly
 - All data is **synthetic** (no real PANs). Dates are **dynamic** so the demo always looks current.
 - The POC simulates "files received" + a manual **Run**; in production the agent triggers
   automatically when all files land on sFTP.
-- BASE II byte-offsets are *representative* (the exact layout is a proprietary Visa spec); recon
+- BASE II — ITF byte-offsets are *representative* (the exact layout is a proprietary Visa spec); recon
   matches on ARN / amounts / dates, so this doesn't affect results. See [SOURCES.md](SOURCES.md).

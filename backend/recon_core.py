@@ -26,7 +26,7 @@ def _money(minor: str, exp: int) -> Decimal:
 # Visa BASE II clearing (fixed-width)  — see write_visa_clearing() in gen_unrecon_day.py
 # ---------------------------------------------------------------------------
 def parse_visa_baseii(*paths: str) -> list[dict]:
-    """Parse one or more Visa BASE II files (Domestic and/or International) into records."""
+    """Parse one or more Visa BASE II — ITF files (National and/or International) into records."""
     recs: list[dict] = []
     for path in paths:
         with open(path, encoding="utf-8") as f:
@@ -74,7 +74,7 @@ def parse_thredd_xml(path: str) -> list[dict]:
             "settle_date": cf.findtext("SettlementDate"),
             "scheme_settle_date": cf.findtext("SchemeSettlementDate"),
             "isa": Decimal(_attr(cf, "FeeAmt", "value", "0")),
-            "region": "INTL" if _attr(cf, "MsgSource", "value") == "54" else "DOM",
+            "region": "INTL" if _attr(cf, "MsgSource", "value") == "54" else "NAT",
             "merchant": (cf.findtext("MerchCode") or "").strip(),
             "mcc": _attr(cf, "Classification", "MCC"),
         })
@@ -208,8 +208,8 @@ def discover(data_dir: str) -> dict:
     sre = re.search(r"VISA_SETTLEMENT_NET_(\d+)_", os.path.basename(net_path)).group(1)
     return {
         "d1": d1, "d2": d2, "sre": sre,
-        "visa_dom":  os.path.join(data_dir, f"VISA_CLR_DOM_{sre}_{d1}.txt"),
-        "visa_intl": os.path.join(data_dir, f"VISA_CLR_INTL_{sre}_{d1}.txt"),
+        "visa_nat":  os.path.join(data_dir, f"VISA_CLR_NAT_{sre}_{d1}.itf"),
+        "visa_intl": os.path.join(data_dir, f"VISA_CLR_INTL_{sre}_{d1}.itf"),
         "thredd_d1": os.path.join(data_dir, f"THREDD_TXN_REPORT_{d1}.xml"),
         "thredd_d2": os.path.join(data_dir, f"THREDD_TXN_REPORT_{d2}.xml"),
         "visa_net":  net_path,
@@ -218,7 +218,7 @@ def discover(data_dir: str) -> dict:
 def run(data_dir: str) -> dict:
     """Discover the day's files, parse, reconcile. Returns findings + file metadata."""
     fp = discover(data_dir)
-    visa = parse_visa_baseii(fp["visa_dom"], fp["visa_intl"])
+    visa = parse_visa_baseii(fp["visa_nat"], fp["visa_intl"])
     td1 = parse_thredd_xml(fp["thredd_d1"])
     td2 = parse_thredd_xml(fp["thredd_d2"])
     with open(fp["visa_net"], encoding="utf-8") as f:
