@@ -47,24 +47,23 @@ def _regenerate():
     cmd = [sys.executable, GEN_PATH, "--out", DATA_DIR] + (["--as-of", DEMO_AS_OF] if DEMO_AS_OF else [])
     try:
         os.makedirs(DATA_DIR, exist_ok=True)
+        _clear_generated()   # wipe any prior dataset first, so a stale SRE/extension can't linger
         subprocess.run(cmd, check=True, capture_output=True, text=True, timeout=60)
     except Exception as e:
         print(f"[startup] regenerate failed ({e}) — serving existing data."); return
-    d1, d2 = _target_dates()
-    _prune_keep({d1, d2})   # keep ONLY the set we just generated (handles pinned past dates too)
+    d1, _ = _target_dates()
     print(f"[startup] dataset regenerated for D1={d1}" + (f" (pinned DEMO_AS_OF={DEMO_AS_OF})" if DEMO_AS_OF else " (today)"))
 
 
-def _prune_keep(keep: set):
-    """Remove generated files whose embedded date isn't in `keep` (the target D1/D2)."""
+def _clear_generated():
+    """Remove all previously generated dataset files (any SRE/date) so only the freshly generated set
+    remains. Prevents a stale SRE or extension — e.g. after a rename, or in a mounted volume — from
+    lingering and making discover() build a path to files that don't exist."""
     prefixes = ("VISA_CLR_", "VISA_SETTLEMENT_NET_", "THREDD_TXN_REPORT_", "clearing_detail_")
     for p in glob.glob(os.path.join(DATA_DIR, "*")):
-        b = os.path.basename(p)
-        if b.startswith(prefixes):
-            m = re.search(r"_(\d{8})\.\w+$", b)   # the date is the 8 digits before the extension
-            if m and m.group(1) not in keep:      # (not any 8-digit run — the 10-digit SRE contains one)
-                try: os.remove(p)
-                except OSError: pass
+        if os.path.basename(p).startswith(prefixes):
+            try: os.remove(p)
+            except OSError: pass
 
 
 def _ensure_fresh():
