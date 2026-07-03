@@ -11,5 +11,6 @@ async function j(path, opts) {
 }
 
 export const getFiles = () => j('/files')
+export const getActivity = () => j('/activity')
 export const getPreview = (name) => j(`/file/${encodeURIComponent(name)}/preview`)
 export const runReconcile = () => j('/reconcile', { method: 'POST' })

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { getFiles, getPreview, runReconcile } from './api.js'
+import { getFiles, getActivity, getPreview, runReconcile } from './api.js'
 
 const gbp = (n) =>
   n == null ? '—' : '£' + Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+// Multi-currency formatter for the Activity overview + per-day detail (the dashboard stays GBP via gbp()).
+const CCY = { GBP: ['£', 2], EUR: ['€', 2], USD: ['US$', 2], AUD: ['A$', 2], JPY: ['¥', 0], NZD: ['NZ$', 2], SGD: ['S$', 2] }
+const money = (n, ccy) => n == null ? '—' : (CCY[ccy]?.[0] ?? '') +
+  Number(n).toLocaleString('en-GB', { minimumFractionDigits: CCY[ccy]?.[1] ?? 2, maximumFractionDigits: CCY[ccy]?.[1] ?? 2 })
 const fmtDay = (d) => (d ? `${d.slice(6, 8)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+d.slice(4, 6) - 1]} ${d.slice(0, 4)}` : '')
 // display-only: never show the processor's brand in file names (real name is still used for fetch)
 const maskName = (n) => (n ? n.replace('THREDD_TXN_REPORT', 'PROCESSOR_TXN_REPORT') : n)
 
 const REVEAL = { raw: 1, timing: 3, fx: 4, rounding: 4, explained: 4, isa: 5, residual: 5 }
 const NAV = [
-  ['▦', 'Dashboard', 'dashboard'], ['⇄', 'Reconciliation', 'reconciliation'],
+  ['▤', 'Activity Reconciliation', 'activity'],
+  ['▦', 'Reconciliation Agent', 'dashboard'], ['⇄', 'Transactions', 'reconciliation'],
 ]
 
 const catTotals = (cls) => {
@@ -129,21 +134,37 @@ const TXN_STATUS = {
   residual:      { label: 'Unreconciled',            bucket: 'break' },
   platform_only: { label: 'Unreconciled · platform', bucket: 'break' },
 }
-const svc = (region) => (region === 'INTL' ? 'International' : region === 'DOM' ? 'National' : '—')
+const svc = (region) => (region === 'INTL' ? 'International' : region === 'NAT' ? 'National' : '—')
+// Friendlier headers for the file-preview tables (data keys are unchanged)
+const PREVIEW_LABELS = { settlement_amt: 'Net Processed', settle_gbp: 'Net Settlement' }
 
-function ReconciliationView({ result }) {
+// Per-day transaction detail. Reached by clicking an Activity row (or the sidebar).
+//  - a reconciled history day → its mock transactions (amounts in that day's settlement currency)
+//  - the real GBP day (selectedDay.real, or no selection) → the engine's transactions from the run
+function ReconciliationView({ result, selectedDay, onBack }) {
   const [filter, setFilter] = useState('all')
-  const txns = result?.findings?.transactions
+  const isMock = selectedDay && !selectedDay.real
+  const txns = isMock ? selectedDay.transactions : result?.findings?.transactions
+  const displayCcy = isMock ? selectedDay.currency : 'GBP'
+  const crumb = onBack && <span className="crumb" onClick={onBack}>← Back to Activity</span>
+  const title = selectedDay
+    ? <>Transactions <span className="muted">{fmtDay(selectedDay.date)} · {selectedDay.currency} · {selectedDay.service}</span></>
+    : <>Transactions</>
+
   if (!txns) return (
-    <section className="card panel"><h2>Transactions</h2>
-      <div className="empty">Click <b>Run reconciliation</b> to list every transaction as reconciled or unreconciled.</div>
+    <section className="card panel">{crumb}<h2>{title}</h2>
+      <div className="empty">Click <b>Run reconciliation</b> on the Dashboard to list every transaction as reconciled or unreconciled.</div>
     </section>
   )
-  const sum = result.findings.transaction_summary || {}
   const rows = txns.filter((t) => filter === 'all' || TXN_STATUS[t.status]?.bucket === filter)
+  const reconciled = txns.filter((t) => TXN_STATUS[t.status]?.bucket === 'reconciled').length
+  const broke = txns.length - reconciled
   return (
-    <section className="card panel">
-      <h2>Transactions <span className="muted">{sum.total} txns · {sum.reconciled} reconciled · {sum.break} unreconciled</span></h2>
+    <section className="card panel">{crumb}
+      <h2>{title}<span className="muted">{txns.length} txns · {reconciled} reconciled · {broke} unreconciled</span></h2>
+      {isMock && (
+        <div className="ok-banner">✓ Auto-cleared — Net Settlement = Net Processed, gap {money(0, displayCcy)}. Nothing to explain.</div>
+      )}
       <div className="txn-filter">
         {[['all', 'All'], ['reconciled', 'Reconciled'], ['break', 'Unreconciled']].map(([f, lbl]) => (
           <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{lbl}</button>
@@ -155,7 +176,7 @@ function ReconciliationView({ result }) {
           <th style={{ textAlign: 'right' }}>Net Settlement</th>
           <th style={{ textAlign: 'right' }}>Gap</th>
           <th style={{ textAlign: 'right' }}>Net Processed</th>
-          <th>Ccy</th><th>Service</th>
+          <th>Ccy</th><th>Clearing</th>
         </tr></thead>
         <tbody>
           {rows.map((t, i) => {
@@ -164,11 +185,68 @@ function ReconciliationView({ result }) {
               <tr key={i} className={s.bucket === 'break' ? 'res' : ''}>
                 <td><span className={`pill ${t.status}`}>{s.label}</span></td>
                 <td><b>{t.merchant}</b>{t.arn && <div className="mono">{t.arn}</div>}</td>
-                <td className="amt">{gbp(t.visa_amount)}</td>
-                <td className="amt">{gbp(t.gap)}</td>
-                <td className="amt">{t.thredd_amount == null ? '—' : gbp(t.thredd_amount)}</td>
+                <td className="amt">{money(t.visa_amount, displayCcy)}</td>
+                <td className="amt">{money(t.gap, displayCcy)}</td>
+                <td className="amt">{t.thredd_amount == null ? '—' : money(t.thredd_amount, displayCcy)}</td>
                 <td>{t.source_ccy || '—'}</td>
                 <td>{svc(t.region)}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </section>
+  )
+}
+
+// Activity Reconciliation overview: recent settlement records, one row per (date × currency).
+// Every row is clickable → its per-day transactions. Only the real GBP row is Unreconciled; after a
+// run it reflects the deterministic residual ("Residual → analyst · <amount> unexplained").
+function ActivityView({ rows, result, onOpenDay }) {
+  const [filter, setFilter] = useState('all')
+  if (!rows) return (
+    <section className="card panel"><div className="empty">Loading…</div></section>
+  )
+  const ranDay = result?.findings?.dates?.reconciled_day
+  const residual = result?.findings?.facts?.residual?.total
+  const shown = rows.filter((r) => filter === 'all'
+    || (filter === 'break' ? r.status === 'unreconciled' : r.status === 'reconciled'))
+  const nBreak = rows.filter((r) => r.status === 'unreconciled').length
+  return (
+    <section className="card panel">
+      <h2><span className="muted">{rows.length} settlement records · {nBreak} unreconciled</span></h2>
+      <div className="txn-filter">
+        {[['all', 'All'], ['reconciled', 'Reconciled'], ['break', 'Unreconciled']].map(([f, lbl]) => (
+          <button key={f} className={`chip ${filter === f ? 'on' : ''}`} onClick={() => setFilter(f)}>{lbl}</button>
+        ))}
+      </div>
+      <table className="x">
+        <thead><tr>
+          <th>Status</th><th>Settlement Date</th>
+          <th style={{ textAlign: 'right' }}>Net Settlement</th>
+          <th style={{ textAlign: 'right' }}>Gap</th>
+          <th style={{ textAlign: 'right' }}>Net Processed</th>
+          <th>Currency</th><th>Settlement Service</th>
+        </tr></thead>
+        <tbody>
+          {shown.map((r, i) => {
+            const un = r.status === 'unreconciled'
+            const ran = un && r.real && result && ranDay === r.date   // residual revealed after the run
+            return (
+              <tr key={i} className={`act-click ${un ? 'res' : ''}`} onClick={() => onOpenDay(r)}>
+                <td>
+                  <span className={`pill ${un ? (ran ? 'routed' : 'residual') : 'matched'}`}>
+                    {un ? (ran ? 'Residual → analyst' : 'Unreconciled') : 'Reconciled'}
+                  </span>
+                </td>
+                <td>{fmtDay(r.date)}</td>
+                <td className="amt">{money(r.net_settlement, r.currency)}</td>
+                <td className="amt">{money(r.gap, r.currency)}
+                  {ran && <div className="sub-res">{money(residual, r.currency)} unexplained</div>}
+                </td>
+                <td className="amt">{money(r.net_processed, r.currency)}</td>
+                <td>{r.currency}</td>
+                <td>{r.service}</td>
               </tr>
             )
           })}
@@ -189,7 +267,7 @@ function PreviewModal({ name, data, onClose }) {
           {data?.raw_sample && (<><div className="note" style={{ marginTop: 0, marginBottom: 6 }}>Raw BASE II (decoded below):</div><div className="raw">{data.raw_sample.join('\n')}</div></>)}
           {data?.rows && (
             <table className="x">
-              <thead><tr>{data.columns.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+              <thead><tr>{data.columns.map((c) => <th key={c}>{PREVIEW_LABELS[c] ?? c}</th>)}</tr></thead>
               <tbody>{data.rows.map((r, i) => <tr key={i}>{data.columns.map((c) => <td key={c} className={typeof r[c] === 'number' ? 'amt' : ''}>{String(r[c] ?? '')}</td>)}</tr>)}</tbody>
             </table>
           )}
@@ -206,10 +284,18 @@ export default function App() {
   const [visible, setVisible] = useState(0)
   const [doing, setDoing] = useState(-1)
   const [preview, setPreview] = useState(null)
-  const [view, setView] = useState('dashboard')
+  const [view, setView] = useState('activity')
+  const [activity, setActivity] = useState(null)
+  const [selectedDay, setSelectedDay] = useState(null)
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
 
-  useEffect(() => { getFiles().then(setMeta).catch((e) => console.error(e)) }, [])
+  useEffect(() => {
+    getFiles().then(setMeta).catch((e) => console.error(e))
+    getActivity().then((d) => setActivity(d.days)).catch((e) => console.error(e))
+  }, [])
+  // Click a settlement row: the real GBP break opens the Dashboard (run the agent);
+  // a reconciled currency opens its per-day transactions in the Reconciliation view.
+  const openDay = (row) => { setSelectedDay(row); setView(row.real ? 'dashboard' : 'reconciliation') }
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
@@ -267,16 +353,30 @@ export default function App() {
       <main className="main">
         <div className="topbar">
           <div>
-            <h1>Daily Settlement Reconciliation</h1>
-            <div className="sub">{meta ? <>Settlement day <b>{fmtDay(meta.reconciled_day)}</b> · SRE {meta.sre} · catch-up file {fmtDay(meta.catch_up_day)}</> : 'Loading…'}</div>
+            {view === 'activity' && <>
+              <h1>Activity Reconciliation</h1>
+              <div className="sub">{meta ? <>Recent settlement activity</> : 'Loading…'}</div>
+            </>}
+            {view === 'dashboard' && <>
+              <h1>Daily Settlement Reconciliation</h1>
+              <div className="sub">{meta ? <>Settlement day <b>{fmtDay(meta.reconciled_day)}</b> · catch-up file {fmtDay(meta.catch_up_day)}</> : 'Loading…'}</div>
+            </>}
+            {view === 'reconciliation' && <>
+              <h1>Transaction Detail</h1>
+              <div className="sub">{selectedDay ? <>{fmtDay(selectedDay.date)} · {selectedDay.currency} · {selectedDay.service}</> : 'Per-day transactions'}</div>
+            </>}
           </div>
-          <div className="right">
-            {!running && <span className={`badge ${(result && !hasAgent) || routed ? 'warn' : ''}`}>{badge}</span>}
-            <button className="btn primary" onClick={handleRun} disabled={running}>
-              {running ? <><span className="spin" />Running…</> : 'Run reconciliation'}
-            </button>
-          </div>
+          {view === 'dashboard' && (
+            <div className="right">
+              {!running && <span className={`badge ${(result && !hasAgent) || routed ? 'warn' : ''}`}>{badge}</span>}
+              <button className="btn primary" onClick={handleRun} disabled={running}>
+                {running ? <><span className="spin" />Running…</> : 'Run reconciliation'}
+              </button>
+            </div>
+          )}
         </div>
+
+        {view === 'activity' && <ActivityView rows={activity} result={result} onOpenDay={openDay} />}
 
         {view === 'dashboard' && (<>
         <div className="grid-kpi">
@@ -385,7 +485,7 @@ export default function App() {
         </div>
         </>)}
 
-        {view === 'reconciliation' && <ReconciliationView result={result} />}
+        {view === 'reconciliation' && <ReconciliationView result={result} selectedDay={selectedDay} onBack={() => setView('activity')} />}
       </main>
 
       {preview && <PreviewModal name={preview.name} data={preview.data} onClose={() => setPreview(null)} />}
