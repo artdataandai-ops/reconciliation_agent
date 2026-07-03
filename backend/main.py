@@ -20,6 +20,7 @@ except Exception:
 
 import recon_core
 import lyzr_client
+import demo_history
 
 DATA_DIR = os.getenv("DATA_DIR", r"c:\tasks\vss110\data")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -181,3 +182,21 @@ def reconcile():
             agent_error = f"Lyzr call failed: {e}"
     return {"findings": findings, "agent": agent,
             "agent_connected": lyzr_client.is_configured(), "agent_error": agent_error}
+
+@app.get("/api/activity")
+def activity():
+    """Activity Reconciliation overview: recent settlement days per (date × currency).
+
+    Row 0 is today's *real* GBP stream (the deterministic engine's totals) — the one with an
+    exception, drilled into on the dashboard. The rest are fabricated reconciled history in other
+    settlement currencies (demo_history), so the overview reflects a multi-currency program. Uses
+    _ensure_fresh() like the other endpoints, so dates auto-advance; numbers stay fixed."""
+    _ensure_fresh()
+    findings = recon_core.run(DATA_DIR)
+    t, d = findings["totals"], findings["dates"]
+    current = {
+        "date": d["reconciled_day"], "currency": findings["currency"], "service": "International",
+        "net_settlement": t["visa_net_settlement"], "net_processed": t["thredd_day1_sum"],
+        "gap": t["raw_difference"], "status": "unreconciled", "real": True,
+    }
+    return {"days": [current] + demo_history.build_history(d["reconciled_day"])}
