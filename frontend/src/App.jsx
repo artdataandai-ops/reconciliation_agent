@@ -136,7 +136,7 @@ const TXN_STATUS = {
 }
 const svc = (region) => (region === 'INTL' ? 'International' : region === 'NAT' ? 'National' : '—')
 // Friendlier headers for the file-preview tables (data keys are unchanged)
-const PREVIEW_LABELS = { settlement_amt: 'Net Processed', settle_gbp: 'Net Settlement' }
+const PREVIEW_LABELS = { settlement_amt: 'Processed Amount', settle_gbp: 'Settlement Amount' }
 
 // Per-day transaction detail. Reached by clicking an Activity row (or the sidebar).
 //  - a reconciled history day → its mock transactions (amounts in that day's settlement currency)
@@ -163,7 +163,7 @@ function ReconciliationView({ result, selectedDay, onBack }) {
     <section className="card panel">{crumb}
       <h2>{title}<span className="muted">{txns.length} txns · {reconciled} reconciled · {broke} unreconciled</span></h2>
       {isMock && (
-        <div className="ok-banner">✓ Auto-cleared — Net Settlement = Net Processed, gap {money(0, displayCcy)}. Nothing to explain.</div>
+        <div className="ok-banner">✓ Auto-cleared — Settlement Amount = Processed Amount, gap {money(0, displayCcy)}. Nothing to explain.</div>
       )}
       <div className="txn-filter">
         {[['all', 'All'], ['reconciled', 'Reconciled'], ['break', 'Unreconciled']].map(([f, lbl]) => (
@@ -173,9 +173,9 @@ function ReconciliationView({ result, selectedDay, onBack }) {
       <table className="x">
         <thead><tr>
           <th>Status</th><th>Merchant</th>
-          <th style={{ textAlign: 'right' }}>Net Settlement</th>
           <th style={{ textAlign: 'right' }}>Gap</th>
-          <th style={{ textAlign: 'right' }}>Net Processed</th>
+          <th style={{ textAlign: 'right' }}>Settlement Amount</th>
+          <th style={{ textAlign: 'right' }}>Processed Amount</th>
           <th>Ccy</th><th>Clearing</th>
         </tr></thead>
         <tbody>
@@ -185,8 +185,8 @@ function ReconciliationView({ result, selectedDay, onBack }) {
               <tr key={i} className={s.bucket === 'break' ? 'res' : ''}>
                 <td><span className={`pill ${t.status}`}>{s.label}</span></td>
                 <td><b>{t.merchant}</b>{t.arn && <div className="mono">{t.arn}</div>}</td>
-                <td className="amt">{money(t.visa_amount, displayCcy)}</td>
                 <td className="amt">{money(t.gap, displayCcy)}</td>
+                <td className="amt">{money(t.visa_amount, displayCcy)}</td>
                 <td className="amt">{t.thredd_amount == null ? '—' : money(t.thredd_amount, displayCcy)}</td>
                 <td>{t.source_ccy || '—'}</td>
                 <td>{svc(t.region)}</td>
@@ -223,9 +223,9 @@ function ActivityView({ rows, result, onOpenDay }) {
       <table className="x">
         <thead><tr>
           <th>Status</th><th>Settlement Date</th>
-          <th style={{ textAlign: 'right' }}>Net Settlement</th>
           <th style={{ textAlign: 'right' }}>Gap</th>
-          <th style={{ textAlign: 'right' }}>Net Processed</th>
+          <th style={{ textAlign: 'right' }}>Settlement Amount</th>
+          <th style={{ textAlign: 'right' }}>Processed Amount</th>
           <th>Currency</th><th>Settlement Service</th>
         </tr></thead>
         <tbody>
@@ -240,10 +240,10 @@ function ActivityView({ rows, result, onOpenDay }) {
                   </span>
                 </td>
                 <td>{fmtDay(r.date)}</td>
-                <td className="amt">{money(r.net_settlement, r.currency)}</td>
                 <td className="amt">{money(r.gap, r.currency)}
                   {ran && <div className="sub-res">{money(residual, r.currency)} unexplained</div>}
                 </td>
+                <td className="amt">{money(r.net_settlement, r.currency)}</td>
                 <td className="amt">{money(r.net_processed, r.currency)}</td>
                 <td>{r.currency}</td>
                 <td>{r.service}</td>
