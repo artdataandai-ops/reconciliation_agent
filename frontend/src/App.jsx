@@ -40,7 +40,7 @@ function normStep(s, i) {
 function Sidebar({ view, onNavigate, theme, onToggleTheme }) {
   return (
     <aside className="sidebar">
-      <div className="brand"><span className="dot">R</span>
+      <div className="brand"><span className="dot"><img src="/monogram.png" alt="Panasa" /></span>
         <div className="brand-text"><div className="brand-name">Recon Agent</div><div className="brand-desc">Reconciliation Agent</div></div>
       </div>
       <nav className="nav">{NAV.map(([ic, l, key]) => (
