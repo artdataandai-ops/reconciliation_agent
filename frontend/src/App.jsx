@@ -54,7 +54,7 @@ function Sidebar({ view, onNavigate, theme, onToggleTheme }) {
         <span className="ico">{theme === 'dark' ? '☀' : '☾'}</span>
         {theme === 'dark' ? 'Light theme' : 'Dark theme'}
       </button>
-      <div className="side-foot">Panasa</div>
+      <div className="side-foot">Panasa Tech</div>
     </aside>
   )
 }
