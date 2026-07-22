@@ -3,10 +3,10 @@
 :root{
   --bg:#0f1115; --surface:#181b21; --ink:#e6e8eb; --ink2:#c2c7cf; --muted:#8b929e;
   --line:#2a2f37; --line2:#22262e;
-  --accent:#FEC422; --accent-strong:#eab308; --accent-soft:#2a2410; --accent-line:#4a3d12;
+  --accent:#FFAE9B; --accent-strong:#F2896E; --accent-soft:#2e1a15; --accent-line:#5c2f26;
   --chip:#23272e; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.45);
   --radius:14px;
-  --file-bg:#1d2128; --on-accent:#3a2f00; --accent-ink:#f3d985;
+  --file-bg:#1d2128; --on-accent:#063622; --accent-ink:#FFCBBD;
   --visa-bg:#1e2348; --visa-ink:#9aa6ff;
   --ok-bg:#14301f; --ok-ink:#6bd29a;
   --bad-bg:#3a1d14; --bad-ink:#f0a285; --bad-line:#5c2b1a;
@@ -17,9 +17,9 @@
 :root[data-theme="light"]{
   --bg:#f3f4f6; --surface:#ffffff; --ink:#1f2937; --ink2:#374151; --muted:#6b7280;
   --line:#e6e8eb; --line2:#eef0f3;
-  --accent:#FEC422; --accent-strong:#eab308; --accent-soft:#fef7e0; --accent-line:#f3d985;
+  --accent:#FFAE9B; --accent-strong:#F2896E; --accent-soft:#FFECE7; --accent-line:#FFD4C9;
   --chip:#f3f4f6; --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.05);
-  --file-bg:#fcfcfd; --on-accent:#3a2f00; --accent-ink:#7a5b00;
+  --file-bg:#fcfcfd; --on-accent:#063622; --accent-ink:#8A3B28;
   --visa-bg:#eef2ff; --visa-ink:#3743a8;
   --ok-bg:#e7f5ec; --ok-ink:#2f7a4f;
   --bad-bg:#fdece2; --bad-ink:#9a3b1a; --bad-line:#f3c6ad;
@@ -141,7 +141,7 @@ table.x tr.act-click.res:hover{background:var(--accent-line)}
 .step.on .num{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .step.doing .num{background:var(--accent-soft);border-color:var(--accent-line)}
 .step.doing{opacity:1}
-.spin-d{display:inline-block;width:12px;height:12px;border:2px solid #c9a227;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
+.spin-d{display:inline-block;width:12px;height:12px;border:2px solid #E0876F;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
 .step .tl{font-weight:700;font-size:13px}
 .step .dt{color:var(--muted);font-size:12px;margin-top:3px;line-height:1.45}
 .step.pending{opacity:.4}

@@ -54,7 +54,7 @@ function Sidebar({ view, onNavigate, theme, onToggleTheme }) {
         <span className="ico">{theme === 'dark' ? '☀' : '☾'}</span>
         {theme === 'dark' ? 'Light theme' : 'Dark theme'}
       </button>
-      <div className="side-foot">Art Technology and Software</div>
+      <div className="side-foot">Panasa</div>
     </aside>
   )
 }
@@ -85,7 +85,7 @@ function Waterfall({ totals, residual, visible }) {
     { k: 'Timing', v: totals.timing, c: '#6b7280', from: REVEAL.timing },
     { k: 'FX rate-timing', v: totals.fx, c: '#9ca3af', from: REVEAL.fx },
     { k: 'Rounding', v: Math.abs(totals.rounding), c: '#cbd5e1', from: REVEAL.rounding },
-    { k: 'True break → analyst', v: residual, c: '#FEC422', res: true, from: REVEAL.residual },
+    { k: 'True break → analyst', v: residual, c: '#FFAE9B', res: true, from: REVEAL.residual },
   ]
   const total = all.reduce((s, x) => s + Math.abs(x.v), 0) || 1
   const shown = all.filter((s) => visible >= s.from)
@@ -93,7 +93,7 @@ function Waterfall({ totals, residual, visible }) {
     <div>
       <div className="wf-bar">
         {shown.map((s) => (
-          <div key={s.k} className="wf-seg" style={{ width: `${(Math.abs(s.v) / total) * 100}%`, background: s.c, color: s.res ? '#3a2f00' : '#fff' }}>
+          <div key={s.k} className="wf-seg" style={{ width: `${(Math.abs(s.v) / total) * 100}%`, background: s.c, color: s.res ? '#063622' : '#fff' }}>
             {Math.abs(s.v) / total > 0.08 ? gbp(s.v) : ''}
           </div>
         ))}
